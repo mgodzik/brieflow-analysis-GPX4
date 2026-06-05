@@ -1,0 +1,4 @@
+sample_fp	plate	round	well	channel
+/Volumes/Elements/pheno/plate_1/round_1/WellA1_ChannelPacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X_Seq0000.nd2	1	1	A1	PacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X
+/Volumes/Elements/pheno/plate_1/round_1/WellA2_ChannelPacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X_Seq0001.nd2	1	1	A2	PacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X
+/Volumes/Elements/pheno/plate_1/round_1/WellA3_ChannelPacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X_Seq0002.nd2	1	1	A3	PacBlue_penta_20X,mNeonGreen_penta_20X,AF555_penta_20X,AF647_penta_20X,AF750_penta_20X

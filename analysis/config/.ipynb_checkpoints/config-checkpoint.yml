@@ -1,0 +1,32 @@
+
+# ~BrieFlow analysis configuration file~
+
+# All paths are resolved relative to the directory the workflow is run from.
+
+# Parameters:
+all:
+  root_fp: /Volumes/Elements/brieflow_output/
+preprocess:
+  sbs_samples_fp: config/sbs_samples.tsv
+  sbs_combo_fp: config/sbs_combo.tsv
+  phenotype_samples_fp: config/phenotype_samples.tsv
+  phenotype_combo_fp: config/phenotype_combo.tsv
+  sbs_data_format: tiff
+  sbs_data_organization: channel
+  sbs_channel_order:
+  - 405_nm_-_Penta
+  - 561_nm_-_G
+  - 561_nm_-_T
+  - 638_nm_-_A
+  - 638_nm_-_C
+  sbs_channel_order_flip: false
+  sbs_n_z_planes: 1
+  sbs_metadata_samples_df_fp: config/sbs_metadata_samples.tsv
+  phenotype_data_format: nd2
+  phenotype_data_organization: well
+  phenotype_channel_order: null
+  phenotype_channel_order_flip: false
+  phenotype_round_order: null
+  phenotype_n_z_planes: 1
+  phenotype_metadata_samples_df_fp: null
+  sample_fraction: 0.05
