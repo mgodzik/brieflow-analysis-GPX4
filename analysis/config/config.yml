@@ -5,7 +5,7 @@
 
 # Parameters:
 all:
-  root_fp: /Volumes/Elements/brieflow_output/
+  root_fp: /mnt/brieflow_output/
 preprocess:
   sbs_samples_fp: config/sbs_samples.tsv
   sbs_combo_fp: config/sbs_combo.tsv
@@ -30,3 +30,79 @@ preprocess:
   phenotype_n_z_planes: 1
   phenotype_metadata_samples_df_fp: null
   sample_fraction: 0.05
+sbs:
+  alignment_method: DAPI
+  channel_names:
+  - DAPI
+  - G
+  - T
+  - A
+  - C
+  upsample_factor: 2
+  window: 2
+  skip_cycles_indices: null
+  manual_background_cycle_index: null
+  manual_channel_mapping: null
+  extra_channel_indices:
+  - 0
+  max_filter_width: 3
+  spot_detection_method: standard
+  dapi_cycle: 1
+  dapi_cycle_index: 0
+  cyto_cycle: 1
+  cyto_cycle_index: 0
+  dapi_index: 0
+  cyto_index: 4
+  segmentation_method: cellpose
+  gpu: false
+  reconcile: contained_in_cells
+  segment_cells: true
+  df_barcode_library_fp: config/barcode_library.tsv
+  threshold_peaks: 400
+  call_reads_method: median
+  bases:
+  - G
+  - T
+  - A
+  - C
+  q_min: 0
+  error_correct: true
+  max_distance: 1
+  sort_calls: count
+  n_barcodes: 2
+  barcode_type: simple
+  gt_raw_threshold: 0.55
+  cycle1_ct_from_raw: true
+  barcode_col: iBAR_2
+  prefix_col: prefix
+  peak_width: 5
+  nuclei_diameter: 70
+  cell_diameter: 120
+  nuclei_flow_threshold: 0.4
+  nuclei_cellprob_threshold: 0.0
+  cell_flow_threshold: 1
+  cell_cellprob_threshold: 0
+  cellpose_model: cyto3
+phenotype:
+  foci_channel_index: null
+  channel_names:
+  - GPX4
+  - mNeon
+  - FISH
+  - MitoTracker
+  - WGA
+  align: null
+  dapi_index: 1
+  cyto_index: 4
+  segmentation_method: cellpose
+  reconcile: contained_in_cells
+  gpu: false
+  segment_cells: true
+  cp_method: cp_emulator
+  nuclei_diameter: 36.12575996921784
+  cell_diameter: 57.52520818533983
+  nuclei_flow_threshold: 0.4
+  nuclei_cellprob_threshold: 0.0
+  cell_flow_threshold: 1
+  cell_cellprob_threshold: 0
+  cellpose_model: cyto3

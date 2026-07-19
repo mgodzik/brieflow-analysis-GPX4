@@ -1,3 +1,4 @@
 [submodule "brieflow"]
 	path = brieflow
-	url = https://github.com/amoralous/brieflow_GPX4.git
+	url = git@github.com:mgodzik/brieflow.git
+	branch = gpx4

@@ -1,0 +1,125 @@
+# Snakemake 8+ workflow profile — brieflow 3-well scale-up
+# Usage:  snakemake <target> --workflow-profile scaleup/resources_profile ...
+#
+# Controls per-rule threads + memory WITHOUT editing brieflow source.
+# Includes combine_* (tile->well aggregation) pinned to 130000 MB so they run one at a
+# time under a 230000 global budget (pass --resources mem_mb=230000 on the CLI).
+# Rule names verified against rules/{preprocess,sbs,phenotype,merge}.smk (brieflow 1.4.13).
+#
+# mem_mb values are STARTING points from measured ~6 GB/tile peak RSS on the GPX4 VM.
+# RE-MEASURE with /usr/bin/time -v on 1 tile after any custom brieflow edit, then set
+# mem_mb = true_peak_MB * 1.3.  Snakemake caps concurrent jobs so sum(mem_mb) <= --resources mem_mb.
+
+# Global default: pass --resources mem_mb=<0.9 * machine_RAM_MB> on the CLI per stage.
+# e.g. n2-highmem-32 (256 GB) -> --resources mem_mb=230000
+
+default-resources:
+  mem_mb: 6000
+  runtime: 120        # minutes; raise for GPU-less segmentation
+
+# --- per-rule thread counts ---
+set-threads:
+  # Preprocess (I/O + light compute)
+  convert_sbs: 2
+  convert_phenotype: 2
+  calculate_ic_sbs: 4
+  calculate_ic_phenotype: 4
+  # SBS heavy stages
+  align_sbs: 4
+  log_filter: 2
+  compute_standard_deviation: 2
+  find_peaks: 2
+  max_filter: 2
+  apply_ic_field_sbs: 2
+  segment_sbs: 4            # CPU fallback; GPU stage uses gpu resource below
+  extract_bases: 2
+  call_reads: 2
+  call_cells: 2
+  # Tile->well aggregation (single job holds a whole well's reads/cells)
+  combine_reads: 2
+  combine_cells: 2
+  combine_sbs_info: 2
+  combine_phenotype_info: 2
+  # Phenotype
+  apply_ic_field_phenotype: 2
+  align_phenotype: 2
+  segment_phenotype: 4      # CPU fallback; GPU stage uses gpu resource below
+  identify_cytoplasm: 2
+  extract_phenotype_info: 1
+  extract_phenotype_cp: 4   # CellProfiler feature extraction — heaviest pheno step
+  # Merge (whole-well single pass)
+  fast_alignment: 4
+  merge: 4
+  format_merge: 2
+  deduplicate_merge: 2
+  final_merge: 2
+
+# --- per-rule memory (MB) ---
+set-resources:
+  # RAM-heavy: full multi-cycle SBS stacks in memory (~6 GB/tile measured -> 8 GB with headroom)
+  align_sbs:
+    mem_mb: 8000
+  log_filter:
+    mem_mb: 8000
+  compute_standard_deviation:
+    mem_mb: 6000
+  find_peaks:
+    mem_mb: 6000
+  max_filter:
+    mem_mb: 8000
+  apply_ic_field_sbs:
+    mem_mb: 6000
+  segment_sbs:
+    mem_mb: 8000
+  extract_bases:
+    mem_mb: 6000
+  call_reads:
+    mem_mb: 4000
+  call_cells:
+    mem_mb: 4000
+  # --- Tile->well aggregation: RAM-heavy, SERIALIZED ---
+  # 130000 forces one-at-a-time given a 230000 global budget (130000*2 > 230000).
+  # This is a SCHEDULING lever, not a measured allocation: re-measure one combine
+  # job's true peak with /usr/bin/time -v and keep mem_mb both above that peak AND
+  # > 50% of the global budget so serialization holds.
+  combine_reads:
+    mem_mb: 130000
+  combine_cells:
+    mem_mb: 130000
+  combine_sbs_info:
+    mem_mb: 130000
+  combine_phenotype_info:
+    mem_mb: 130000
+  # Phenotype
+  segment_phenotype:
+    mem_mb: 6000
+  identify_cytoplasm:
+    mem_mb: 4000
+  extract_phenotype_cp:
+    mem_mb: 8000        # CellProfiler holds full 3200^2 per channel + object features
+  # Merge — whole-well triangle hash can hold all cells of a well
+  fast_alignment:
+    mem_mb: 16000
+  merge:
+    mem_mb: 16000
+  final_merge:
+    mem_mb: 12000
+
+# ============================================================================
+# GPU stage (B) — run segmentation ONLY, on the g2/L4 VM.
+# Snakemake does not natively schedule GPUs; declare a custom "gpu" resource and
+# cap it to the number of GPUs on the box so N segment jobs run per GPU count.
+# On the GPU VM, invoke with:
+#   snakemake --until segment_sbs segment_phenotype \
+#     --workflow-profile scaleup/resources_profile \
+#     --config sbs/gpu=true phenotype/gpu=true \
+#     --resources gpu=1 mem_mb=110000 --cores all
+# and set gpu:1 on the two segment rules by uncommenting below.
+# ============================================================================
+# set-resources:
+#   segment_sbs:
+#     gpu: 1
+#     mem_mb: 12000
+#   segment_phenotype:
+#     gpu: 1
+#     mem_mb: 12000
